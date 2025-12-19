@@ -1,37 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Navbar from './components/Navbar'
-import About from './components/About'
-import Contact from './components/Contact'
-import Home from './components/Home'
-import Projects from './components/Porjects'
-import Skills from './components/Skills'
-import { Route, Routes } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import Home from './components/Home';
+import About from './components/About';
+import Services from './components/Services';
+import Pricing from './components/Pricing';
+import Contact from './components/Contact';
+import './App.css';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
+  const [activeSection, setActiveSection] = useState('home');
 
+  // Handle scroll to detect active section
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['home', 'services', 'about', 'pricing', 'contact'];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Function to scroll to section
+  const scrollToSection = (sectionId : any) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop,
+        behavior: 'smooth'
+      });
+      setActiveSection(sectionId);
+    }
+    
+  };
 
   return (
-    <>
-      <div>
-
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/About" element={<About />} />
-          <Route path="/Skills" element={<Skills />} />
-          <Route path="/Projects" element={<Projects />} />
-          <Route path="/Contact" element={<Contact />} />
-
-        </Routes>
-
-
-
-      </div>
-    </>
-  )
-
+    <div className="app-container">
+      <Navbar activeSection={activeSection } scrollToSection={scrollToSection} />
+      
+      {/* All sections on one page */}
+      <section id="home">
+        <Home />
+      </section>
+      
+      <section id="services">
+        <Services />
+      </section>
+      
+      <section id="about">
+        <About />
+      </section>
+      
+      <section id="pricing">
+        <Pricing />
+      </section>
+      
+      <section id="contact">
+        <Contact />
+      </section>
+     < ScrollToTop />
+    </div>
+  );
 }
-export default App
+
+export default App;
